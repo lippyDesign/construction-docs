@@ -7,7 +7,6 @@ import { connect } from 'react-redux';
 import { fetchProjectDetails, updateProjectDetails, updateFormInitialValues } from '../redux/actions';
 
 import GenericForm from '../components/formBuilder/GenericForm';
-import formValues from 'redux-form/lib/formValues';
 
 const styles = theme => ({
   sectionPaper: {

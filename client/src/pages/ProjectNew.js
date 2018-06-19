@@ -10,11 +10,14 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Paper from '@material-ui/core/Paper';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Avatar from '@material-ui/core/Avatar';
+import Chip from '@material-ui/core/Chip';
+import FaceIcon from '@material-ui/icons/Face';
 
 import Drawer from '../components/drawer/Drawer';
 import GenericForm from '../components/formBuilder/GenericForm';
 
-import { createNewProject, updateFormInitialValues } from '../redux/actions';
+import { fetchAvailableForms, createNewProject, updateFormInitialValues } from '../redux/actions';
 
 import fileUploadImage from '../images/fileUpload.png';
 
@@ -84,6 +87,20 @@ const styles = theme => ({
     backgroundColor: 'rgba(0,0,0,0.5)',
     width: '100%',
     textAlign: 'center'
+  },
+  chipWrapper: {
+    marginTop: 10
+  },
+  selectedChip: {
+    backgroundColor: '#26A69A',
+    color: '#fff',
+    '&:hover': {
+      backgroundColor: '#009688'
+    }
+  },
+  selectedChipAvatar: {
+    backgroundColor: '#00897B',
+    color: '#fff'
   }
 });
 
@@ -104,9 +121,13 @@ const availableProjectTypes = [
 ];
 
 class ProjectNew extends React.Component {
-  state = { selectedProject: availableProjectTypes[0] };
+  state = {
+    selectedProject: availableProjectTypes[0],
+    
+  };
 
-  componentDidMount() {
+  async componentDidMount() {
+    await this.props.fetchAvailableForms();
     this.props.updateFormInitialValues({ 'Project Start Date': moment().format("YYYY-MM-DD") });
   }
 
@@ -147,6 +168,52 @@ class ProjectNew extends React.Component {
 
   ///////// DRAWER MAIN ///////////////
 
+  renderResponsiblePeople = () => {
+    const { classes } = this.props;
+    return <div className={classes.responsiblePeople}>
+      <Typography variant="subheading">Select responsible people:</Typography>
+      {this.renderPeopleThatNeedToBeSelected()}
+      {this.renderPeopleThatHaveBeenSelected()}
+    </div>;
+  }
+
+  renderPeopleThatNeedToBeSelected = () => {
+    const { classes, availableForms } = this.props;
+    return availableForms.map(form => <div className={classes.chipWrapper} key={form.id}>
+      <Chip
+        avatar={<Avatar><FaceIcon /></Avatar>}
+        label={form.title}
+        onClick={this.handleChipClick}
+      />
+    </div>);
+  }
+
+  renderPeopleThatHaveBeenSelected = () => {
+    const { classes, availableForms } = this.props;
+    return availableForms.map(form => <div className={classes.chipWrapper} key={form.id}>
+      <Chip
+        avatar={<Avatar>MB</Avatar>}
+        label={form.title}
+        onClick={this.handleChipClick}
+        onDelete={this.handleChipDelete}
+        className={classes.selectedChip}
+        classes={{
+          root: classes.selectedChip,
+          avatar: classes.selectedChipAvatar,
+          clickable: classes.selectedChipAvatarClick
+        }}
+      />
+    </div>);
+  }
+
+  handleChipClick = () => {
+
+  }
+
+  handleChipDelete = () => {
+
+  }
+
   renderForm = () => {
     const { id, infoToBeCollected } = this.state.selectedProject;
     return <GenericForm
@@ -174,16 +241,18 @@ class ProjectNew extends React.Component {
 
   getDrawerMainContent = () => {
     return <Paper className={this.props.classes.mainPaper}>
+      {this.renderResponsiblePeople()}
       {this.renderForm()}
     </Paper>;
   }
 
   render() {
-    const { classes, loading, error } = this.props;
+    const { classes, loading, error, availableForms } = this.props;
     if (error) return <Typography variant="subheading">{error}</Typography>
     if (loading) return <div className={classes.progressWrapper}>
       <CircularProgress size={50} />
     </div>;
+    if (!availableForms) return <div />
     return <Drawer
       drawerMainTitle={this.state.selectedProject.title}
       drawerMainContent={this.getDrawerMainContent()}
@@ -193,7 +262,11 @@ class ProjectNew extends React.Component {
 }
 
 const mapStateToProps = state => {
-  return { error: state.projects.error, loading: state.projects.loading };
+  return {
+    error: state.projects.error,
+    loading: state.projects.loading,
+    availableForms: state.forms.availableForms
+  };
 };
 
-export default connect(mapStateToProps, { createNewProject, updateFormInitialValues })(withStyles(styles, { withTheme: true })(ProjectNew));
+export default connect(mapStateToProps, { fetchAvailableForms, createNewProject, updateFormInitialValues })(withStyles(styles, { withTheme: true })(ProjectNew));

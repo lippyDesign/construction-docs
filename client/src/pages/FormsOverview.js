@@ -6,16 +6,16 @@ import Toolbar from '@material-ui/core/Toolbar';
 import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import Avatar from '@material-ui/core/Avatar';
-import Paper from '@material-ui/core/Paper';
-import FolderIcon from '@material-ui/icons/Folder';
-import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import Button from '@material-ui/core/Button';
-import FormGroup from '@material-ui/core/FormGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
+// import ListItem from '@material-ui/core/ListItem';
+// import ListItemText from '@material-ui/core/ListItemText';
+// import Avatar from '@material-ui/core/Avatar';
+// import Paper from '@material-ui/core/Paper';
+// import FolderIcon from '@material-ui/icons/Folder';
+// import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
+// import FormGroup from '@material-ui/core/FormGroup';
+// import FormControlLabel from '@material-ui/core/FormControlLabel';
+// import Switch from '@material-ui/core/Switch';
 
 import FormsList from '../components/FormsList';
 
@@ -131,7 +131,7 @@ class FormsOverview extends React.Component {
   // }
 
   renderListOfSidebarOptions = () => {
-    const { classes, formsSidebarItems, selectedForms } = this.props;
+    const { classes /*, formsSidebarItems, selectedForms*/ } = this.props;
     return <List>
       <div className={classes.newFormButtonWrapper}>
         <Button variant="raised" color="secondary" component={Link} to="/forms/new">
@@ -241,7 +241,7 @@ class FormsOverview extends React.Component {
   // }
 
   render() {
-    const { classes } = this.props;
+    // const { classes } = this.props;
     // const { formsSidebarItems, selectedForms } = this.props;
     // if (!formsSidebarItems || !selectedForms) return <div />;
     if (!this.props.userForms) return <div/>;

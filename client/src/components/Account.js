@@ -78,7 +78,7 @@ class Account extends React.Component {
   }
 
   renderPublicProfile = () => {
-    const { classes, user } = this.props;
+    const { classes } = this.props;
     return <Paper className={classes.sectionPaper}>
       <Typography variant="subheading" noWrap className={classes.sectionTitle}>
         Public Profile

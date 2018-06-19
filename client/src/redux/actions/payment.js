@@ -1,4 +1,4 @@
-import axios from 'axios';
+// import axios from 'axios';
 
 const stripePublishableKey =
   process.env.NODE_ENV === 'production' ?
@@ -18,9 +18,9 @@ export const savePaymentInfo = (info, amount) => dispatch => {
     } else {
       console.log(response);
       try {
-        const { data } = await axios.post(`${process.env.REACT_APP_PAYMENT_SERVICE_URL}/charge-stripe`, {
-          amount: 50, stripeToken: response, currency: 'usd', description: 'user 123 payment for abc'
-        });
+        // const { data } = await axios.post(`${process.env.REACT_APP_PAYMENT_SERVICE_URL}/charge-stripe`, {
+        //   amount: 50, stripeToken: response, currency: 'usd', description: 'user 123 payment for abc'
+        // });
       } catch(e) {
         console.log(e);
         return dispatch({ type: SAVE_PAYMENT_INFO_ERROR });
