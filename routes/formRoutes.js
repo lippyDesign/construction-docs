@@ -12,7 +12,7 @@ module.exports = app => {
       res.send(form);
     } catch(e) {
       console.log(e);
-      res.send(500, 'unable to fetch form');
+      res.status(400).send('unable to fetch form');
     }
   });
 
@@ -26,7 +26,7 @@ module.exports = app => {
       res.send(forms);
     } catch(e) {
       console.log(e);
-      res.send(500, 'unable to fetch forms');
+      res.status(400).send('unable to fetch forms');
     }
   });
 
@@ -49,7 +49,7 @@ module.exports = app => {
       res.send(form);
     } catch (err) {
       console.log(err);
-      res.send(400, 'unable to create form');
+      res.status(400).send('unable to create form');
     }
   });
 
@@ -67,7 +67,7 @@ module.exports = app => {
       res.send(updatedForm);
     } catch (err) {
       console.log(err);
-      res.send(400, 'Unable to update form');
+      res.status(400).send('Unable to update form');
     }
   });
 

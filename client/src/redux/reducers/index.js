@@ -4,11 +4,13 @@ import authReducer from './authReducer';
 import formsReducer from './formsReducer';
 import utilReducer from './utilReducer';
 import projectsReducer from './projectsReducer';
+import usersReducer from './usersReducer';
 
 export default combineReducers({
   auth: authReducer,
   form: reduxForm,
   forms: formsReducer,
   util: utilReducer,
-  projects: projectsReducer
+  projects: projectsReducer,
+  users: usersReducer
 });

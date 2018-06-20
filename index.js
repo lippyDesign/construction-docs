@@ -9,6 +9,9 @@ const keys = require('./config/keys');
 require('./models/User');
 require('./models/Form');
 require('./models/Project');
+require('./models/FormField');
+require('./models/FormType');
+require('./models/ProjectUser');
 
 //services
 require('./services/passport');
@@ -33,6 +36,7 @@ require('./routes/uploadRoutes')(app);
 require('./routes/projectRoutes')(app);
 require('./routes/chargeRoutes')(app);
 require('./routes/dueRoutes')(app);
+require('./routes/userRoutes')(app);
 
 // if we are in production or ci, we want to serve the client using express
 if (['production', 'ci'].includes(process.env.NODE_ENV)) {

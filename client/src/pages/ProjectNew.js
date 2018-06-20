@@ -3,9 +3,9 @@ import moment from 'moment';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
+import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Paper from '@material-ui/core/Paper';
@@ -16,8 +16,9 @@ import FaceIcon from '@material-ui/icons/Face';
 
 import Drawer from '../components/drawer/Drawer';
 import GenericForm from '../components/formBuilder/GenericForm';
+import SimpleDialog from '../components/SimpleDialog';
 
-import { fetchAvailableForms, createNewProject, updateFormInitialValues } from '../redux/actions';
+import { fetchAvailableForms, createNewProject, updateFormInitialValues, fetchUsers } from '../redux/actions';
 
 import fileUploadImage from '../images/fileUpload.png';
 
@@ -89,7 +90,8 @@ const styles = theme => ({
     textAlign: 'center'
   },
   chipWrapper: {
-    marginTop: 10
+    marginTop: 10,
+    marginBottom: 10
   },
   selectedChip: {
     backgroundColor: '#26A69A',
@@ -101,6 +103,10 @@ const styles = theme => ({
   selectedChipAvatar: {
     backgroundColor: '#00897B',
     color: '#fff'
+  },
+  usersList: {
+    height: 500,
+    overflowY: 'scroll'
   }
 });
 
@@ -123,10 +129,14 @@ const availableProjectTypes = [
 class ProjectNew extends React.Component {
   state = {
     selectedProject: availableProjectTypes[0],
-    
+    dialogOpen: false,
+    formType: null,
+    selectedForms: {},
+    projectAdmin: null
   };
 
   async componentDidMount() {
+    await this.props.fetchUsers();
     await this.props.fetchAvailableForms();
     this.props.updateFormInitialValues({ 'Project Start Date': moment().format("YYYY-MM-DD") });
   }
@@ -168,34 +178,85 @@ class ProjectNew extends React.Component {
 
   ///////// DRAWER MAIN ///////////////
 
+  renderExecutivesThatNeedToBeSelected = () => {
+    if (this.state.selectedForms.adminForm) return;
+    const { classes } = this.props;
+    return <div className={classes.responsiblePeople}>
+      <Typography variant="subheading">Select project admin:</Typography>
+      <div className={classes.chipWrapper}>
+        <Chip
+          avatar={<Avatar><FaceIcon /></Avatar>}
+          label='Project Admin'
+          onClick={() => this.handleChipClick({ id: 'adminForm', title: 'Admin' })}
+        />
+      </div>
+    </div>;
+  }
+
+  renderExecutivesThatHaveBeenSelected = () => {
+    if (!this.state.selectedForms.adminForm) return;
+    const { classes } = this.props;
+    return <div className={classes.responsiblePeople}>
+    <Typography variant="subheading">Select project admin:</Typography>
+      <div className={classes.chipWrapper}>
+        <Chip
+          avatar={<Avatar>{this.state.selectedForms.adminForm.firstName[0]} {this.state.selectedForms.adminForm.lastName[0]}</Avatar>}
+          label='Project Admin'
+          onClick={() => this.handleChipClick({ id: 'adminForm', title: 'Admin' })}
+          onDelete={() => this.handleChipDelete('adminForm')}
+          className={classes.selectedChip}
+          classes={{
+            root: classes.selectedChip,
+            avatar: classes.selectedChipAvatar,
+            clickable: classes.selectedChipAvatarClick
+          }}
+        />
+      </div>
+    </div>;
+  }
+
   renderResponsiblePeople = () => {
     const { classes } = this.props;
     return <div className={classes.responsiblePeople}>
       <Typography variant="subheading">Select responsible people:</Typography>
       {this.renderPeopleThatNeedToBeSelected()}
       {this.renderPeopleThatHaveBeenSelected()}
+      {this.renderSimpleDialog()}
     </div>;
   }
 
   renderPeopleThatNeedToBeSelected = () => {
     const { classes, availableForms } = this.props;
-    return availableForms.map(form => <div className={classes.chipWrapper} key={form.id}>
+    const filteredForms = availableForms.filter(form => !this.state.selectedForms[form.id])
+    return filteredForms.map(form => <div className={classes.chipWrapper} key={form.id}>
       <Chip
         avatar={<Avatar><FaceIcon /></Avatar>}
         label={form.title}
-        onClick={this.handleChipClick}
+        onClick={() => this.handleChipClick(form)}
       />
     </div>);
   }
 
   renderPeopleThatHaveBeenSelected = () => {
+    if (!this.state.selectedForms) return;
     const { classes, availableForms } = this.props;
-    return availableForms.map(form => <div className={classes.chipWrapper} key={form.id}>
+    const filteredForms = [];
+    availableForms.forEach(form => {
+      if (this.state.selectedForms[form.id]) {
+        filteredForms.push({
+          ...form,
+          firstName: this.state.selectedForms[form.id].firstName,
+          lastName: this.state.selectedForms[form.id].lastName,
+          personId: this.state.selectedForms[form.id].personId
+        });
+      }
+    });
+    return filteredForms.map(form => <div className={classes.chipWrapper} key={form.id}>
       <Chip
-        avatar={<Avatar>MB</Avatar>}
+        avatar={<Avatar>{form.firstName[0]} {form.lastName[0]}</Avatar>}
         label={form.title}
         onClick={this.handleChipClick}
-        onDelete={this.handleChipDelete}
+        onDelete={() => this.handleChipDelete(form.id)}
         className={classes.selectedChip}
         classes={{
           root: classes.selectedChip,
@@ -206,12 +267,47 @@ class ProjectNew extends React.Component {
     </div>);
   }
 
-  handleChipClick = () => {
-
+  renderSimpleDialog = () => {
+    if (!this.state.formType) return;
+    const { users, classes } = this.props;
+    const { title, shortName } = this.state.formType;
+    return <div>
+      <SimpleDialog
+        open={this.state.dialogOpen}
+        title={`${title} ${shortName ? `(${shortName})` : ''}`}
+        body={
+          <List className={classes.usersList}>
+            {users.map(({ email, _id, firstName, lastName, company }) => <ListItem button onClick={() => this.selectPerson(_id, firstName, lastName)} key={_id}>
+              <Avatar>
+                <FaceIcon />
+              </Avatar>
+              <ListItemText primary={`${firstName} ${lastName}`} secondary={`${company}, ${email}`} />
+            </ListItem>)}
+          </List>}
+        onClose={this.closeSimpleDialog}
+      />
+    </div>;
   }
 
-  handleChipDelete = () => {
+  closeSimpleDialog = () => {
+    this.setState({ dialogOpen: false, dialogTitle: '' });
+  }
 
+  selectPerson = (personId, firstName, lastName) => {
+    this.setState({
+      selectedForms: {...this.state.selectedForms, [this.state.formType.id]:{ ...this.state.formType, personId, firstName, lastName } }
+    });
+    this.closeSimpleDialog();
+  }
+
+  handleChipClick = (formType) => {
+    this.setState({ dialogOpen: true, formType })
+  }
+
+  handleChipDelete = formId => {
+    const { selectedForms } = this.state;
+    const { [formId]: omit, ...otherForms } = selectedForms;
+    this.setState({ selectedForms: otherForms });
   }
 
   renderForm = () => {
@@ -234,6 +330,7 @@ class ProjectNew extends React.Component {
       startDate: formValues['Project Start Date'],
       notes: formValues['Project Notes'],
       type: 'general',
+      ownerId: this.state.selectedForms.adminForm ? this.state.selectedForms.adminForm.id : null,
       users: []
     };
     this.props.createNewProject(projectData, this.props.history);
@@ -241,20 +338,22 @@ class ProjectNew extends React.Component {
 
   getDrawerMainContent = () => {
     return <Paper className={this.props.classes.mainPaper}>
+      {this.renderExecutivesThatNeedToBeSelected()}
+      {this.renderExecutivesThatHaveBeenSelected()}
       {this.renderResponsiblePeople()}
       {this.renderForm()}
     </Paper>;
   }
 
   render() {
-    const { classes, loading, error, availableForms } = this.props;
+    const { classes, projectLoading, error, availableForms, usersLoading } = this.props;
     if (error) return <Typography variant="subheading">{error}</Typography>
-    if (loading) return <div className={classes.progressWrapper}>
+    if (projectLoading || usersLoading) return <div className={classes.progressWrapper}>
       <CircularProgress size={50} />
     </div>;
     if (!availableForms) return <div />
     return <Drawer
-      drawerMainTitle={this.state.selectedProject.title}
+      drawerMainTitle={`Create ${this.state.selectedProject.title}`}
       drawerMainContent={this.getDrawerMainContent()}
       drawerSidebarContent={this.getDrawerSidebarContent()}
     />
@@ -264,9 +363,11 @@ class ProjectNew extends React.Component {
 const mapStateToProps = state => {
   return {
     error: state.projects.error,
-    loading: state.projects.loading,
+    projectLoading: state.projects.loading,
+    usersLoading: state.users.loading,
+    users: state.users.users,
     availableForms: state.forms.availableForms
   };
 };
 
-export default connect(mapStateToProps, { fetchAvailableForms, createNewProject, updateFormInitialValues })(withStyles(styles, { withTheme: true })(ProjectNew));
+export default connect(mapStateToProps, { fetchAvailableForms, createNewProject, updateFormInitialValues, fetchUsers })(withStyles(styles, { withTheme: true })(ProjectNew));

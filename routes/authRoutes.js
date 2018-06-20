@@ -26,7 +26,7 @@ module.exports = app => {
       res.send(updatedUser);
     } catch (err) {
       console.log(err);
-      res.send(400, 'Unable to update user');
+      res.status(400).send('Unable to update user');
     }
   });
 

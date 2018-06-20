@@ -26,7 +26,7 @@ module.exports = app => {
 
   // POST create a new project
   app.post('/api/projects', requireLogin, cleanCache, async (req, res) => {
-    const { title, address, city, state, postalCode, startDate, notes, type, users } = req.body;
+    const { title, address, city, state, postalCode, startDate, notes, type, users, ownerId } = req.body;
     const project = new Project({
       title,
       address,
@@ -36,7 +36,7 @@ module.exports = app => {
       startDate,
       notes,
       type,
-      ownerId: req.user.id,
+      ownerId: ownerId || req.user.id,
       users
     });
     try {
@@ -44,13 +44,13 @@ module.exports = app => {
       res.send(project);
     } catch (err) {
       console.log(err);
-      res.send(400, 'Unable to create project');
+      res.status(400).send('Unable to create project');
     }
   });
 
   // PUT update details of a particular project
   app.put('/api/projects/:id', requireLogin, cleanCache, async (req, res) => {
-    const { title, address, city, state, postalCode, startDate, notes, type, users } = req.body;
+    const { title, address, city, state, postalCode, startDate, notes, type, users, ownerId } = req.body;
     try {
       const updatedProject = await Project.findByIdAndUpdate(req.params.id, {
         title,
@@ -61,13 +61,13 @@ module.exports = app => {
         startDate,
         notes,
         type,
-        ownerId: req.user.id,
+        ownerId: ownerId || req.user.id,
         users
       }, { new: true });
       res.send(updatedProject);
     } catch (err) {
       console.log(err);
-      res.send(400, 'Unable to update project');
+      res.status(400).send('Unable to update project');
     }
   });
 
