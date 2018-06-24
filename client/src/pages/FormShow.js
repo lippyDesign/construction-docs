@@ -143,7 +143,7 @@ class FormShow extends React.Component {
 
 const mapStateToProps = (state) => {
   const { availableForms, userForm, error } = state.forms;
-  const selectedForm = userForm && availableForms ? availableForms.find(f => f.id === userForm.formTypeId) : null;
+  const selectedForm = userForm && availableForms ? availableForms.find(f => f._id === userForm.formTypeId) : null;
   const initialProj = userForm ? state.projects.userProjects.find(project => project._id === userForm.projectId) : null;
   const initialProjId = initialProj ? initialProj._id : null;
   return { userForm, selectedForm, error, userProjects: state.projects.userProjects, initialProjId };

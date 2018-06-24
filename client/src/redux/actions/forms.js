@@ -6,22 +6,23 @@ export const FETCH_AVAILABLE_FORMS_ERROR = 'fetch_available_forms_error';
 export const fetchAvailableForms = () => async dispatch => {
   dispatch({ type: FETCH_AVAILABLE_FORMS_START });
   try {
-    const data = [
-      {
-        id: 'p-t-p',
-        title: 'Daily Planning',
-        shortName: 'PTP',
-        infoToBeCollected: [
-          { title: 'Date on the form', mustBeFilledOut: true, inputType: 'date' },
-          { title: 'Number of workers', mustBeFilledOut: true, inputType: 'text' },
-          { title: 'Number of units of equipment', mustBeFilledOut: true, inputType: 'text' },
-          { title: 'Notes', mustBeFilledOut: false, inputType:'text', multiline: true }
-        ]
-      },
-      { id: 's-d-r', title: 'Superintendent Daily Report', shortName: 'SDR', infoToBeCollected: [{ title: 'Date on the form', mustBeFilledOut: true, inputType: 'date' },{ title: 'Number of workers', mustBeFilledOut: true, inputType:'text' }, { title: 'Number of units of equipment', mustBeFilledOut: true, inputType: 'text' }, { title: 'Notes', mustBeFilledOut: false, inputType: 'text', multiline: true }]},
-      { id: 'safety-inspection', title: 'Safety Inspection', shortName: '', infoToBeCollected: [{ title: 'Date on the form', mustBeFilledOut: true, inputType: 'date' },{ title: 'Notes', mustBeFilledOut: false, inputType:'text', multiline: true }]},
-      { id: 'tools-and-equipment-inspection', title: 'Tools and Equipment Inspection', shortName: '', infoToBeCollected: [{ title: 'Date on the form', mustBeFilledOut: true, inputType: 'date' },{ title: 'Notes', mustBeFilledOut: false, inputType:'text', multiline: true }]},
-    ]
+    // const data = [
+    //   {
+    //     id: 'p-t-p',
+    //     title: 'Daily Planning',
+    //     shortName: 'PTP',
+    //     infoToBeCollected: [
+    //       { title: 'Date on the form', mustBeFilledOut: true, inputType: 'date' },
+    //       { title: 'Number of workers', mustBeFilledOut: true, inputType: 'text' },
+    //       { title: 'Number of units of equipment', mustBeFilledOut: true, inputType: 'text' },
+    //       { title: 'Notes', mustBeFilledOut: false, inputType:'text', multiline: true }
+    //     ]
+    //   },
+    //   { id: 's-d-r', title: 'Superintendent Daily Report', shortName: 'SDR', infoToBeCollected: [{ title: 'Date on the form', mustBeFilledOut: true, inputType: 'date' },{ title: 'Number of workers', mustBeFilledOut: true, inputType:'text' }, { title: 'Number of units of equipment', mustBeFilledOut: true, inputType: 'text' }, { title: 'Notes', mustBeFilledOut: false, inputType: 'text', multiline: true }]},
+    //   { id: 'safety-inspection', title: 'Safety Inspection', shortName: '', infoToBeCollected: [{ title: 'Date on the form', mustBeFilledOut: true, inputType: 'date' },{ title: 'Notes', mustBeFilledOut: false, inputType:'text', multiline: true }]},
+    //   { id: 'tools-and-equipment-inspection', title: 'Tools and Equipment Inspection', shortName: '', infoToBeCollected: [{ title: 'Date on the form', mustBeFilledOut: true, inputType: 'date' },{ title: 'Notes', mustBeFilledOut: false, inputType:'text', multiline: true }]},
+    // ]
+    const { data } = await axios.get('/api/formtypes');
     dispatch({ type: FETCH_AVAILABLE_FORMS_SUCCESS, payload: data });
   } catch (e) {
     console.log(e)

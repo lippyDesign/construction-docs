@@ -3,6 +3,7 @@ const requireLogin = require('../middlewares/requireLogin');
 const cleanCache = require('../middlewares/cleanCache');
 
 const Form = mongoose.model('Form');
+const FormType = mongoose.model('FormType');
 
 module.exports = app => {
   // GET a form with a particular id
@@ -68,6 +69,21 @@ module.exports = app => {
     } catch (err) {
       console.log(err);
       res.status(400).send('Unable to update form');
+    }
+  });
+
+  /////// FORM TYPES ///////
+
+  // GET all form types that user has access to
+  app.get('/api/formtypes', requireLogin, async (req, res) => {
+    try {
+      const formtypes = await FormType.find({})
+        .populate('infoToBeCollected')
+        // TODO: create cache
+      res.send(formtypes);
+    } catch(e) {
+      console.log(e);
+      res.status(400).send('unable to fetch form types');
     }
   });
 

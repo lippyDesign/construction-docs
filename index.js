@@ -5,6 +5,10 @@ const passport = require('passport');
 const bodyParser = require('body-parser');
 const keys = require('./config/keys');
 
+// set up mongoose and connect to mongo
+mongoose.Promise = global.Promise;
+mongoose.connect(keys.mongoURI);
+
 // models
 require('./models/User');
 require('./models/Form');
@@ -16,10 +20,7 @@ require('./models/ProjectUser');
 //services
 require('./services/passport');
 require('./services/cache');
-
-// set up mongoose and connect to mongo
-mongoose.Promise = global.Promise;
-mongoose.connect(keys.mongoURI);
+require('./services/setUpFieldsAndForms')();
 
 // set up express and instruct it to use bodyParser,
 // express will use cookie sessions and passport for authentication

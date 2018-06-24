@@ -29,7 +29,7 @@ export default function(state = INITIAL_STATE, action) {
     case FETCH_AVAILABLE_FORMS_START:
       return { ...state, error: '', availableForms: null };
     case FETCH_AVAILABLE_FORMS_SUCCESS:
-      return { ...state, error: '', availableForms: action.payload, selectedFormId: action.payload[0].id };
+      return { ...state, error: '', availableForms: action.payload, selectedFormId: action.payload[0]._id };
     case FETCH_AVAILABLE_FORMS_ERROR:
       return { ...state, error: action.payload, availableForms: null };
     case FETCH_USER_FORMS_START:

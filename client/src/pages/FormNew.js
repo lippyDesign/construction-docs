@@ -123,13 +123,13 @@ class FormNew extends React.Component {
   renderListOfForms = () => {
     const { classes, selectedForm } = this.props;
     return <List>
-      {this.props.availableForms.map(({ title, shortName, id }) => <ListItem 
+      {this.props.availableForms.map(({ title, _id }) => <ListItem 
       className={classes.menuListItem} 
-      key={id}
+      key={_id}
       button
-      onClick={() => this.handleFormSelect(id)}
+      onClick={() => this.handleFormSelect(_id)}
       >
-        <ListItemText primary={title} classes={{ primary: id === selectedForm.id ? classes.selectedFormSidebarText : '' }}  />
+        <ListItemText primary={title} classes={{ primary: _id === selectedForm._id ? classes.selectedFormSidebarText : '' }}  />
       </ListItem>)}
     </List>
   }
@@ -151,8 +151,8 @@ class FormNew extends React.Component {
 
   renderForm = () => {
     return <GenericForm
-      form={this.props.selectedForm.id}
-      key={this.props.selectedForm.id}
+      form={this.props.selectedForm._id}
+      key={this.props.selectedForm._id}
       onSubmit={this.onFormSubmit}
       fields={this.props.selectedForm.infoToBeCollected}
     />;
@@ -183,7 +183,7 @@ class FormNew extends React.Component {
 
   renderImages = () => {
     const { classes, selectedForm } = this.props;
-    const imagesForCurrentForm = this.state.images.filter(image => image.formId === selectedForm.id);
+    const imagesForCurrentForm = this.state.images.filter(image => image.formId === selectedForm._id);
     return imagesForCurrentForm.map(image => <div key={image.id} className={classes.selectImageButton} style={{ backgroundImage: `url("${image.imagePreviewUrl}")` }}>
       <Typography variant="title" noWrap className={classes.removeImageText} onClick={() => this.removeImage(image.id)}>
         REMOVE
@@ -225,7 +225,7 @@ class FormNew extends React.Component {
     const id = `img-${this.state.images.length}`;
     reader.onloadend = () => {
       this.setState({
-        images: [...this.state.images, { file, imagePreviewUrl: reader.result, id, formId: this.props.selectedForm.id }]
+        images: [...this.state.images, { file, imagePreviewUrl: reader.result, id, formId: this.props.selectedForm._id }]
       });
     }
     reader.readAsDataURL(file)
@@ -239,7 +239,7 @@ class FormNew extends React.Component {
       numberOfWorkers: formValues['Number of workers'],
       numberOfUnitsOfEquipment: formValues['Number of units of equipment'],
       notes: formValues['Notes'],
-      formTypeId: selectedForm.id,
+      formTypeId: selectedForm._id,
       projectId: this.state.project
     }
     this.props.submitForm(this.state.images, formData, this.props.history);
@@ -282,7 +282,7 @@ const mapStateToProps = state => {
   const { availableForms, selectedFormId, submittingForm, error } = state.forms;
   let selectedForm = null;
   if (availableForms && selectedFormId) {
-    selectedForm = availableForms.find(form => form.id === state.forms.selectedFormId);
+    selectedForm = availableForms.find(form => form._id === state.forms.selectedFormId);
   }
   return {
     error,

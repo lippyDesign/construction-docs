@@ -131,8 +131,7 @@ class ProjectNew extends React.Component {
     selectedProject: availableProjectTypes[0],
     dialogOpen: false,
     formType: null,
-    selectedForms: {},
-    projectAdmin: null
+    selectedForms: {}
   };
 
   async componentDidMount() {
@@ -187,7 +186,7 @@ class ProjectNew extends React.Component {
         <Chip
           avatar={<Avatar><FaceIcon /></Avatar>}
           label='Project Admin'
-          onClick={() => this.handleChipClick({ id: 'adminForm', title: 'Admin' })}
+          onClick={() => this.handleChipClick({ _id: 'adminForm', title: 'Admin' })}
         />
       </div>
     </div>;
@@ -202,7 +201,7 @@ class ProjectNew extends React.Component {
         <Chip
           avatar={<Avatar>{this.state.selectedForms.adminForm.firstName[0]} {this.state.selectedForms.adminForm.lastName[0]}</Avatar>}
           label='Project Admin'
-          onClick={() => this.handleChipClick({ id: 'adminForm', title: 'Admin' })}
+          onClick={() => this.handleChipClick({ _id: 'adminForm', title: 'Admin' })}
           onDelete={() => this.handleChipDelete('adminForm')}
           className={classes.selectedChip}
           classes={{
@@ -221,14 +220,13 @@ class ProjectNew extends React.Component {
       <Typography variant="subheading">Select responsible people:</Typography>
       {this.renderPeopleThatNeedToBeSelected()}
       {this.renderPeopleThatHaveBeenSelected()}
-      {this.renderSimpleDialog()}
     </div>;
   }
 
   renderPeopleThatNeedToBeSelected = () => {
     const { classes, availableForms } = this.props;
-    const filteredForms = availableForms.filter(form => !this.state.selectedForms[form.id])
-    return filteredForms.map(form => <div className={classes.chipWrapper} key={form.id}>
+    const filteredForms = availableForms.filter(form => !this.state.selectedForms[form._id])
+    return filteredForms.map(form => <div className={classes.chipWrapper} key={form._id}>
       <Chip
         avatar={<Avatar><FaceIcon /></Avatar>}
         label={form.title}
@@ -242,21 +240,21 @@ class ProjectNew extends React.Component {
     const { classes, availableForms } = this.props;
     const filteredForms = [];
     availableForms.forEach(form => {
-      if (this.state.selectedForms[form.id]) {
+      if (this.state.selectedForms[form._id]) {
         filteredForms.push({
           ...form,
-          firstName: this.state.selectedForms[form.id].firstName,
-          lastName: this.state.selectedForms[form.id].lastName,
-          personId: this.state.selectedForms[form.id].personId
+          firstName: this.state.selectedForms[form._id].firstName,
+          lastName: this.state.selectedForms[form._id].lastName,
+          personId: this.state.selectedForms[form._id].personId
         });
       }
     });
-    return filteredForms.map(form => <div className={classes.chipWrapper} key={form.id}>
+    return filteredForms.map(form => <div className={classes.chipWrapper} key={form._id}>
       <Chip
         avatar={<Avatar>{form.firstName[0]} {form.lastName[0]}</Avatar>}
         label={form.title}
         onClick={this.handleChipClick}
-        onDelete={() => this.handleChipDelete(form.id)}
+        onDelete={() => this.handleChipDelete(form._id)}
         className={classes.selectedChip}
         classes={{
           root: classes.selectedChip,
@@ -295,7 +293,7 @@ class ProjectNew extends React.Component {
 
   selectPerson = (personId, firstName, lastName) => {
     this.setState({
-      selectedForms: {...this.state.selectedForms, [this.state.formType.id]:{ ...this.state.formType, personId, firstName, lastName } }
+      selectedForms: {...this.state.selectedForms, [this.state.formType._id]:{ ...this.state.formType, personId, firstName, lastName } }
     });
     this.closeSimpleDialog();
   }
@@ -321,6 +319,14 @@ class ProjectNew extends React.Component {
   }
 
   onFormSubmit = formValues => {
+    // get the users and the forms they are responsible for
+    const users = [];
+    for (const selectedForm in this.state.selectedForms) {
+      if (!this.state.selectedForms.hasOwnProperty(selectedForm)) continue;
+      if (selectedForm === "adminForm") continue;
+      users.push({ formTypeId: selectedForm, userId: this.state.selectedForms[selectedForm].personId })
+    }
+
     const projectData = {
       title: formValues['Project Title'],
       address: formValues['Project Address'],
@@ -330,9 +336,10 @@ class ProjectNew extends React.Component {
       startDate: formValues['Project Start Date'],
       notes: formValues['Project Notes'],
       type: 'general',
-      ownerId: this.state.selectedForms.adminForm ? this.state.selectedForms.adminForm.id : null,
-      users: []
+      ownerId: this.state.selectedForms.adminForm ? this.state.selectedForms.adminForm.personId : null,
+      users
     };
+    console.log(projectData)
     this.props.createNewProject(projectData, this.props.history);
   }
 
@@ -342,6 +349,7 @@ class ProjectNew extends React.Component {
       {this.renderExecutivesThatHaveBeenSelected()}
       {this.renderResponsiblePeople()}
       {this.renderForm()}
+      {this.renderSimpleDialog()}
     </Paper>;
   }
 

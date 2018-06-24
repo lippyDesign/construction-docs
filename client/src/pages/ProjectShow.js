@@ -97,6 +97,7 @@ class ProjectShow extends React.Component {
 }
 
 const mapStateToProps = state => {
+  console.log(state.projects.project)
   return { project: state.projects.project };
 }
 
