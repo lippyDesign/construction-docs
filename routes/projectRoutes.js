@@ -41,17 +41,6 @@ module.exports = app => {
       console.log(e);
       res.status(500).send('unable to get projects');
     }
-
-
-
-
-    // try {
-    //   const projects = await Project.find({ $or: [{ ownerId: id }, { users: id }] }).cache({ key: id });
-    //   res.send(projects);
-    // } catch(e) {
-    //   console.log(e);
-    //   res.status(500).send('unable to get projects');
-    // }
   });
 
   // POST create a new project
@@ -66,9 +55,9 @@ module.exports = app => {
       postalCode,
       startDate,
       notes,
-      type,
-      users
+      type
     });
+
     try {
       const newProject = await project.save();
 
@@ -129,6 +118,45 @@ module.exports = app => {
         ownerId: ownerId || req.user.id,
         users
       }, { new: true });
+
+      // remove all project people
+      await ProjectUser.remove({ projectId: updatedProject._id })
+
+      // add new object people
+      const projectOwner = new ProjectUser({
+        userId: ownerId || req.user.id,
+        projectId: updatedProject._id,
+        roles: ['owner'],
+        formTypesMustSubmit: [],
+        formTypesMustReview: users.map(({ formTypeId }) => formTypeId),
+        datePutOnTheProject: startDate
+      });
+
+      const projectUsers = users.reduce((prev, curr) => {
+        let ind;
+        const alreadyExists = prev.find((e, i) => {
+          if (e.userId === curr.userId) ind = i;
+          return e.userId === curr.userId
+        });
+        if (alreadyExists) {
+          alreadyExists.formTypesMustSubmit = [ ...alreadyExists.formTypesMustSubmit, u.formTypeId];
+          prev[ind] = alreadyExists;
+          return prev;
+        } else {
+          const us = new ProjectUser({
+            userId: curr.userId,
+            projectId: updatedProject._id,
+            roles: ['user'],
+            formTypesMustSubmit: [curr.formTypeId]
+          });
+          return [...prev, us];
+        }
+      }, []);
+
+      const combinedUsers = [...projectUsers, projectOwner];
+
+      await Promise.all(combinedUsers.map(user => user.save()));
+
       res.send(updatedProject);
     } catch (err) {
       console.log(err);

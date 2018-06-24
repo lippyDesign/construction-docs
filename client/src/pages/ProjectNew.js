@@ -10,17 +10,12 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Paper from '@material-ui/core/Paper';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Avatar from '@material-ui/core/Avatar';
-import Chip from '@material-ui/core/Chip';
-import FaceIcon from '@material-ui/icons/Face';
 
 import Drawer from '../components/drawer/Drawer';
 import GenericForm from '../components/formBuilder/GenericForm';
-import SimpleDialog from '../components/SimpleDialog';
+import ProjectPeople from '../components/ProjectPeople';
 
 import { fetchAvailableForms, createNewProject, updateFormInitialValues, fetchUsers } from '../redux/actions';
-
-import fileUploadImage from '../images/fileUpload.png';
 
 const styles = theme => ({
   mainToolbarTwo: {
@@ -48,65 +43,6 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center'
-  },
-  selectImagesSection: {
-    display: 'flex',
-    justifyContent: 'space-around',
-    flexWrap: 'wrap'
-  },
-  selectImageButton: {
-    width: 120,
-    height: 120,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-    overflow: 'hidden',
-    cursor: 'pointer',
-    backgroundImage: `url("${fileUploadImage}")`,
-    backgroundRepeat: 'no-repeat',
-    backgroundSize: 'cover',
-    position: 'relative',
-    margin: 5
-  },
-  selectImageText : {
-    color: '#fff',
-    letterSpacing: 1.2,
-    marginBottom: 10
-  },
-  fileUploadLabel: {
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
-    opacity: 0,
-    cursor: 'pointer'
-  },
-  removeImageText: {
-    color: '#fff',
-    letterSpacing: 1.2,
-    paddingBottom: 10,
-    paddingTop: 10,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    width: '100%',
-    textAlign: 'center'
-  },
-  chipWrapper: {
-    marginTop: 10,
-    marginBottom: 10
-  },
-  selectedChip: {
-    backgroundColor: '#26A69A',
-    color: '#fff',
-    '&:hover': {
-      backgroundColor: '#009688'
-    }
-  },
-  selectedChipAvatar: {
-    backgroundColor: '#00897B',
-    color: '#fff'
-  },
-  usersList: {
-    height: 500,
-    overflowY: 'scroll'
   }
 });
 
@@ -129,7 +65,6 @@ const availableProjectTypes = [
 class ProjectNew extends React.Component {
   state = {
     selectedProject: availableProjectTypes[0],
-    dialogOpen: false,
     formType: null,
     selectedForms: {}
   };
@@ -177,129 +112,14 @@ class ProjectNew extends React.Component {
 
   ///////// DRAWER MAIN ///////////////
 
-  renderExecutivesThatNeedToBeSelected = () => {
-    if (this.state.selectedForms.adminForm) return;
-    const { classes } = this.props;
-    return <div className={classes.responsiblePeople}>
-      <Typography variant="subheading">Select project admin:</Typography>
-      <div className={classes.chipWrapper}>
-        <Chip
-          avatar={<Avatar><FaceIcon /></Avatar>}
-          label='Project Admin'
-          onClick={() => this.handleChipClick({ _id: 'adminForm', title: 'Admin' })}
-        />
-      </div>
-    </div>;
-  }
-
-  renderExecutivesThatHaveBeenSelected = () => {
-    if (!this.state.selectedForms.adminForm) return;
-    const { classes } = this.props;
-    return <div className={classes.responsiblePeople}>
-    <Typography variant="subheading">Select project admin:</Typography>
-      <div className={classes.chipWrapper}>
-        <Chip
-          avatar={<Avatar>{this.state.selectedForms.adminForm.firstName[0]} {this.state.selectedForms.adminForm.lastName[0]}</Avatar>}
-          label='Project Admin'
-          onClick={() => this.handleChipClick({ _id: 'adminForm', title: 'Admin' })}
-          onDelete={() => this.handleChipDelete('adminForm')}
-          className={classes.selectedChip}
-          classes={{
-            root: classes.selectedChip,
-            avatar: classes.selectedChipAvatar,
-            clickable: classes.selectedChipAvatarClick
-          }}
-        />
-      </div>
-    </div>;
-  }
-
-  renderResponsiblePeople = () => {
-    const { classes } = this.props;
-    return <div className={classes.responsiblePeople}>
-      <Typography variant="subheading">Select responsible people:</Typography>
-      {this.renderPeopleThatNeedToBeSelected()}
-      {this.renderPeopleThatHaveBeenSelected()}
-    </div>;
-  }
-
-  renderPeopleThatNeedToBeSelected = () => {
-    const { classes, availableForms } = this.props;
-    const filteredForms = availableForms.filter(form => !this.state.selectedForms[form._id])
-    return filteredForms.map(form => <div className={classes.chipWrapper} key={form._id}>
-      <Chip
-        avatar={<Avatar><FaceIcon /></Avatar>}
-        label={form.title}
-        onClick={() => this.handleChipClick(form)}
-      />
-    </div>);
-  }
-
-  renderPeopleThatHaveBeenSelected = () => {
-    if (!this.state.selectedForms) return;
-    const { classes, availableForms } = this.props;
-    const filteredForms = [];
-    availableForms.forEach(form => {
-      if (this.state.selectedForms[form._id]) {
-        filteredForms.push({
-          ...form,
-          firstName: this.state.selectedForms[form._id].firstName,
-          lastName: this.state.selectedForms[form._id].lastName,
-          personId: this.state.selectedForms[form._id].personId
-        });
-      }
-    });
-    return filteredForms.map(form => <div className={classes.chipWrapper} key={form._id}>
-      <Chip
-        avatar={<Avatar>{form.firstName[0]} {form.lastName[0]}</Avatar>}
-        label={form.title}
-        onClick={this.handleChipClick}
-        onDelete={() => this.handleChipDelete(form._id)}
-        className={classes.selectedChip}
-        classes={{
-          root: classes.selectedChip,
-          avatar: classes.selectedChipAvatar,
-          clickable: classes.selectedChipAvatarClick
-        }}
-      />
-    </div>);
-  }
-
-  renderSimpleDialog = () => {
-    if (!this.state.formType) return;
-    const { users, classes } = this.props;
-    const { title, shortName } = this.state.formType;
-    return <div>
-      <SimpleDialog
-        open={this.state.dialogOpen}
-        title={`${title} ${shortName ? `(${shortName})` : ''}`}
-        body={
-          <List className={classes.usersList}>
-            {users.map(({ email, _id, firstName, lastName, company }) => <ListItem button onClick={() => this.selectPerson(_id, firstName, lastName)} key={_id}>
-              <Avatar>
-                <FaceIcon />
-              </Avatar>
-              <ListItemText primary={`${firstName} ${lastName}`} secondary={`${company}, ${email}`} />
-            </ListItem>)}
-          </List>}
-        onClose={this.closeSimpleDialog}
-      />
-    </div>;
-  }
-
-  closeSimpleDialog = () => {
-    this.setState({ dialogOpen: false, dialogTitle: '' });
-  }
-
   selectPerson = (personId, firstName, lastName) => {
     this.setState({
       selectedForms: {...this.state.selectedForms, [this.state.formType._id]:{ ...this.state.formType, personId, firstName, lastName } }
     });
-    this.closeSimpleDialog();
   }
 
   handleChipClick = (formType) => {
-    this.setState({ dialogOpen: true, formType })
+    this.setState({ formType })
   }
 
   handleChipDelete = formId => {
@@ -339,21 +159,26 @@ class ProjectNew extends React.Component {
       ownerId: this.state.selectedForms.adminForm ? this.state.selectedForms.adminForm.personId : null,
       users
     };
-    console.log(projectData)
     this.props.createNewProject(projectData, this.props.history);
   }
 
   getDrawerMainContent = () => {
     return <Paper className={this.props.classes.mainPaper}>
-      {this.renderExecutivesThatNeedToBeSelected()}
-      {this.renderExecutivesThatHaveBeenSelected()}
-      {this.renderResponsiblePeople()}
+      <ProjectPeople
+        selectedForms={this.state.selectedForms}
+        formType={this.state.formType}
+        availableForms={this.props.availableForms}
+        users={this.props.users}
+        handleChipClick={this.handleChipClick}
+        handleChipDelete={this.handleChipDelete}
+        selectPerson={this.selectPerson}
+      />
       {this.renderForm()}
-      {this.renderSimpleDialog()}
     </Paper>;
   }
 
   render() {
+    console.log(this.state.selectedForms)
     const { classes, projectLoading, error, availableForms, usersLoading } = this.props;
     if (error) return <Typography variant="subheading">{error}</Typography>
     if (projectLoading || usersLoading) return <div className={classes.progressWrapper}>

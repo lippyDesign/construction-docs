@@ -7,9 +7,14 @@ import GenericFormField from './GenericFormField';
 
 class GenericForm extends React.Component {
   render() {
-    const { handleSubmit, fields, form, buttonTitle } = this.props;
+    const { handleSubmit, fields, form, buttonTitle, doNotRenderButton, disabled } = this.props;
+    const button = doNotRenderButton ? <span /> :
+      <Button type="submit" variant="raised" color="primary" style={{ marginTop: 30, marginBottom: 30, float: 'right' }}>
+        {buttonTitle || 'Submit'}
+      </Button>;
+
     return <form form={form} onSubmit={handleSubmit}>
-      {fields.map(({ title, mustBeFilledOut, inputType, multiline, defaultValue }) => <Field
+      {fields.map(({ title, mustBeFilledOut, inputType, multiline }) => <Field
         key={`key-${title}`}
         required={mustBeFilledOut}
         name={title}
@@ -17,13 +22,12 @@ class GenericForm extends React.Component {
         label={title}
         margin="normal"
         fullWidth
+        disabled={disabled}
         multiline={multiline}
         rows={4}
         type={inputType || 'text'}
       />)}
-      <Button type="submit" variant="raised" color="primary" style={{ marginTop: 30, marginBottom: 30, float: 'right' }}>
-        {buttonTitle || 'Submit'}
-      </Button>
+      {button}
   </form>
   }
 }
