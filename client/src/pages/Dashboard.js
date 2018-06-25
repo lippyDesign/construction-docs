@@ -54,7 +54,7 @@ class Dashboard extends React.Component {
   getDrawerMainContent = () => {
     switch (this.state.selectedSidebarOption) {
       case 'Upcoming':
-        return <Upcoming />;
+        return <Upcoming history={this.props.history} />;
       case 'Stats':
         return <Stats />;
       case 'Account':

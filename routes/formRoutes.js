@@ -4,6 +4,7 @@ const cleanCache = require('../middlewares/cleanCache');
 
 const Form = mongoose.model('Form');
 const FormType = mongoose.model('FormType');
+const ProjectUser = mongoose.model('ProjectUser');
 
 module.exports = app => {
   // GET a form with a particular id
@@ -84,6 +85,31 @@ module.exports = app => {
     } catch(e) {
       console.log(e);
       res.status(400).send('unable to fetch form types');
+    }
+  });
+
+  /////// FORMS UPCOMING ///////
+
+  // GET all forms that user must submit soon
+  app.get('/api/upcoming/forms', requireLogin, async (req, res) => {
+    try {
+      const projectUsers = await ProjectUser.find({ userId: req.user.id })
+        .populate('formTypesMustSubmit')
+        .populate('formTypesMustReview')
+        .populate('projectId')
+
+      const upcomingForms = projectUsers.reduce((prev, curr) => {
+        const nextVal = [];
+        curr.formTypesMustSubmit.forEach(({ title, shortName, _id }) => {
+          nextVal.push({ title, shortName, _id, projectId: curr.projectId._id, projectTitle: curr.projectId.title });
+        })
+        return [...prev, ...nextVal]
+      }, []);
+
+      res.send(upcomingForms);
+    } catch(e) {
+      console.log(e);
+      res.status(400).send('unable to fetch upcoming forms');
     }
   });
 

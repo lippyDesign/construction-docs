@@ -111,6 +111,12 @@ class FormNew extends React.Component {
     await this.props.fetchProjects();
     await this.props.fetchAvailableForms();
     this.props.updateFormInitialValues({ 'Date on the form': moment().format("YYYY-MM-DD") });
+    if (this.props.match.params.formId) {
+      this.handleFormSelect(this.props.match.params.formId);
+    }
+    if (this.props.match.params.projectId) {
+      this.setState({ project: this.props.match.params.projectId });
+    }
   }
 
   ///////// SIDEBAR ///////////////
@@ -278,7 +284,7 @@ class FormNew extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   const { availableForms, selectedFormId, submittingForm, error } = state.forms;
   let selectedForm = null;
   if (availableForms && selectedFormId) {

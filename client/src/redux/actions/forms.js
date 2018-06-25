@@ -6,22 +6,6 @@ export const FETCH_AVAILABLE_FORMS_ERROR = 'fetch_available_forms_error';
 export const fetchAvailableForms = () => async dispatch => {
   dispatch({ type: FETCH_AVAILABLE_FORMS_START });
   try {
-    // const data = [
-    //   {
-    //     id: 'p-t-p',
-    //     title: 'Daily Planning',
-    //     shortName: 'PTP',
-    //     infoToBeCollected: [
-    //       { title: 'Date on the form', mustBeFilledOut: true, inputType: 'date' },
-    //       { title: 'Number of workers', mustBeFilledOut: true, inputType: 'text' },
-    //       { title: 'Number of units of equipment', mustBeFilledOut: true, inputType: 'text' },
-    //       { title: 'Notes', mustBeFilledOut: false, inputType:'text', multiline: true }
-    //     ]
-    //   },
-    //   { id: 's-d-r', title: 'Superintendent Daily Report', shortName: 'SDR', infoToBeCollected: [{ title: 'Date on the form', mustBeFilledOut: true, inputType: 'date' },{ title: 'Number of workers', mustBeFilledOut: true, inputType:'text' }, { title: 'Number of units of equipment', mustBeFilledOut: true, inputType: 'text' }, { title: 'Notes', mustBeFilledOut: false, inputType: 'text', multiline: true }]},
-    //   { id: 'safety-inspection', title: 'Safety Inspection', shortName: '', infoToBeCollected: [{ title: 'Date on the form', mustBeFilledOut: true, inputType: 'date' },{ title: 'Notes', mustBeFilledOut: false, inputType:'text', multiline: true }]},
-    //   { id: 'tools-and-equipment-inspection', title: 'Tools and Equipment Inspection', shortName: '', infoToBeCollected: [{ title: 'Date on the form', mustBeFilledOut: true, inputType: 'date' },{ title: 'Notes', mustBeFilledOut: false, inputType:'text', multiline: true }]},
-    // ]
     const { data } = await axios.get('/api/formtypes');
     dispatch({ type: FETCH_AVAILABLE_FORMS_SUCCESS, payload: data });
   } catch (e) {
@@ -120,5 +104,19 @@ export const updateFormDetails = (formId, formImages, formData, history) => asyn
   } catch (e) {
     console.log(e)
     dispatch({ type: FETCH_FORM_DETAILS_ERROR, payload: 'There was a problem updating user form' });
+  }
+}
+
+export const FETCH_UPCOMING_FORMS_START = 'fetch_upcoming_forms_start';
+export const FETCH_UPCOMING_FORMS_SUCCESS = 'fetch_upcoming_forms_success';
+export const FETCH_UPCOMING_FORMS_ERROR = 'fetch_upcoming_forms_error';
+export const fetchUpcomingForms = () => async dispatch => {
+  dispatch({ type: FETCH_UPCOMING_FORMS_START });
+  try {
+    const { data } = await axios.get('/api/upcoming/forms');
+    dispatch({ type: FETCH_UPCOMING_FORMS_SUCCESS, payload: data });
+  } catch (e) {
+    console.log(e)
+    dispatch({ type: FETCH_UPCOMING_FORMS_ERROR, payload: 'There was a problem fetching upcoming forms' });
   }
 }

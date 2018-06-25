@@ -12,7 +12,10 @@ import {
   FETCH_FORM_DETAILS_START,
   FETCH_FORM_DETAILS_SUCCESS,
   FETCH_FORM_DETAILS_ERROR,
-  CLEAR_ERROR
+  CLEAR_ERROR,
+  FETCH_UPCOMING_FORMS_START,
+  FETCH_UPCOMING_FORMS_SUCCESS,
+  FETCH_UPCOMING_FORMS_ERROR
 } from '../actions';
 
 const INITIAL_STATE = {
@@ -21,7 +24,9 @@ const INITIAL_STATE = {
   selectedFormId: null,
   submittingForm: false,
   userForms: [],
-  userForm: null
+  userForm: null,
+  upcomingForms: [],
+  loading: false
 }
 
 export default function(state = INITIAL_STATE, action) {
@@ -54,6 +59,12 @@ export default function(state = INITIAL_STATE, action) {
       return { ...state, error: action.payload, userForm: null };
     case CLEAR_ERROR:
       return { ...state, error: '' }
+    case FETCH_UPCOMING_FORMS_START:
+      return { ...state, loading: true, upcomingForms: [], error: '' };
+    case FETCH_UPCOMING_FORMS_SUCCESS:
+      return { ...state, loading: false, upcomingForms: action.payload, error: '' };
+    case FETCH_UPCOMING_FORMS_ERROR:
+      return { ...state, loading: false, error: action.payload, upcomingForms: [] };
     default:
       return state;
   }
