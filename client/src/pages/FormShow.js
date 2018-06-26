@@ -81,7 +81,8 @@ class FormShow extends React.Component {
       numberOfUnitsOfEquipment: formValues['Number of units of equipment'],
       notes: formValues['Notes'],
       formDate: formValues['Date on the form'],
-      projectId: this.state.project
+      projectId: this.state.project,
+      dueOn: this.props.userForm.dueOn
     };
     const formImages = [];
     this.props.updateFormDetails(this.props.match.params.id, formImages, formData, this.props.history);
@@ -111,6 +112,7 @@ class FormShow extends React.Component {
   }
 
   render() {
+    console.log(this.props)
     const { classes, userForm, loading, selectedForm, error, userProjects } = this.props;
     if (loading) return <div className={classes.progressWrapper}>
       <CircularProgress size={50} />
@@ -122,7 +124,8 @@ class FormShow extends React.Component {
       </div>
       <div className={classes.formWrapper}>
         <Typography variant="title">{`${selectedForm.title} ${selectedForm.shortName ? `(${selectedForm.shortName})` : ''}`}</Typography>
-        <Typography className={classes.gry} variant="body1">Created on {moment(userForm.createdAt).format("dddd, MMM Do YYYY")}</Typography>
+        <Typography className={classes.gry} variant="body1">Due on {userForm.dueOn.substring(0, 10)}</Typography>
+        <Typography className={classes.gry} variant="body1">Submitted on {userForm.submittedOn.substring(0, 10)}</Typography>
         {this.renderProjectSelect()}
         <GenericForm
           form={userForm._id}

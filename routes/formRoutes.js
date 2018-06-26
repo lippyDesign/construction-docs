@@ -21,8 +21,9 @@ module.exports = app => {
   // GET all forms that user has access to
   app.get('/api/forms', requireLogin, async (req, res) => {
     try {
-      const forms = await Form.find({ submittedBy: req.user.id }, '_id type formDate projectId')
+      const forms = await Form.find({ submittedBy: req.user.id }, '_id formTypeId submittedOn projectId')
         .populate('projectId', 'title')
+        .populate('formTypeId', 'title shortName')
         // .cache({ key: req.user.id });
         // TODO: fix cache
       res.send(forms);
@@ -34,10 +35,10 @@ module.exports = app => {
 
   // POST submit a new form
   app.post('/api/forms', requireLogin, cleanCache, async (req, res) => {
-    const { type, formDate, numberOfWorkers, numberOfUnitsOfEquipment, notes, imageUrls, projectId, formTypeId } = req.body;
+    const { formDate, numberOfWorkers, numberOfUnitsOfEquipment, notes, imageUrls, projectId, formTypeId } = req.body;
     const form = new Form({
+      dueOn: formDate,
       formTypeId,
-      type, 
       formDate,
       numberOfWorkers,
       numberOfUnitsOfEquipment,
@@ -64,7 +65,7 @@ module.exports = app => {
         numberOfUnitsOfEquipment,
         notes,
         formDate,
-        projectId
+        projectId,
       });
       res.send(updatedForm);
     } catch (err) {

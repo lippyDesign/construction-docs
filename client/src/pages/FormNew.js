@@ -240,7 +240,6 @@ class FormNew extends React.Component {
   onFormSubmit = formValues => {
     const { selectedForm } = this.props;
     const formData = {
-      type: `${selectedForm.title} ${selectedForm.shortName ? `(${selectedForm.shortName})` : ''}`,
       formDate: formValues['Date on the form'],
       numberOfWorkers: formValues['Number of workers'],
       numberOfUnitsOfEquipment: formValues['Number of units of equipment'],

@@ -37,13 +37,17 @@ class FormsList extends React.Component {
           <Avatar>
             <SubjectIcon />
           </Avatar>
-          <ListItemText primary={form.type} secondary={`${form.formDate.substring(0, 10)}, ${form.projectId.title}`} />
+          <ListItemText
+            primary={`${form.formTypeId.title} ${form.formTypeId.shortName ? `(form.formTypeId.shortName)` : ''}`}
+            secondary={`${form.submittedOn.substring(0, 10)}, ${form.projectId.title}`}
+          />
         </ListItem>)}
       </List>
     </Paper>
   }
 
   render() {
+    console.log(this.props.userForms)
     if (this.props.error) return <Typography variant="subheading">{this.props.error}</Typography>
     return <div className={this.props.classes.wrapper}>
       {this.renderForms()}
