@@ -17,6 +17,7 @@ module.exports = app => {
       const accessValidated = projectUsers.some(pUser => pUser.userId.id === req.user.id);
       if (accessValidated) {
         const combined = { ...project.toObject(), projectUsers}
+        console.log(projectUsers)
         res.send(combined);
       } else {
         res.status(403).send({});
@@ -61,25 +62,20 @@ module.exports = app => {
     try {
       const newProject = await project.save();
 
-      const projectOwner = new ProjectUser({
-        userId: ownerId || req.user.id,
-        projectId: newProject._id,
-        roles: ['owner'],
-        formTypesMustSubmit: [],
-        formTypesMustReview: users.map(({ formTypeId }) => formTypeId),
-        datePutOnTheProject: startDate
-      });
-
       const projectUsers = users.reduce((prev, curr) => {
         let ind;
-        const alreadyExists = prev.find((e, i) => {
-          if (e.userId === curr.userId) ind = i;
-          return e.userId === curr.userId
-        });
-        if (alreadyExists) {
-          alreadyExists.formTypesMustSubmit = [ ...alreadyExists.formTypesMustSubmit, u.formTypeId];
-          prev[ind] = alreadyExists;
-          return prev;
+        let existingUser;
+        for (let u = 0; u < prev.length; u++) {
+          if (prev[u].userId.toString() === curr.userId) {
+            existingUser = prev[u];
+            ind = u;
+            break;
+          }
+        }
+        if (existingUser) {
+          existingUser.formTypesMustSubmit = [ ...existingUser.formTypesMustSubmit, curr.formTypeId];
+          const newArr = Object.assign([], prev, { ind: existingUser });
+          return newArr;
         } else {
           const us = new ProjectUser({
             userId: curr.userId,
@@ -91,9 +87,33 @@ module.exports = app => {
         }
       }, []);
 
-      const combinedUsers = [...projectUsers, projectOwner];
-
-      await Promise.all(combinedUsers.map(user => user.save()));
+      let indOwner;
+      let existingUserOwner;
+      const ownerUserId = ownerId || req.user.id;
+      for (let u = 0; u < projectUsers.length; u++) {
+        if (projectUsers[u].userId.toString() === ownerUserId) {
+          existingUserOwner = projectUsers[u];
+          indOwner = u;
+          break;
+        }
+      }
+      if (existingUserOwner) {
+        existingUserOwner.roles = [...existingUserOwner.roles, 'owner']
+        existingUserOwner.formTypesMustReview = users.map(({ formTypeId }) => formTypeId)
+        const newArr = Object.assign([], projectUsers, { indOwner: existingUserOwner });
+        await Promise.all(newArr.map(user => user.save()));
+      } else {
+        const projectOwner = new ProjectUser({
+          userId: ownerId || req.user.id,
+          projectId: newProject._id,
+          roles: ['owner'],
+          formTypesMustSubmit: [],
+          formTypesMustReview: users.map(({ formTypeId }) => formTypeId),
+          datePutOnTheProject: startDate
+        });
+        const combinedUsers = [...projectUsers, projectOwner];
+        await Promise.all(combinedUsers.map(user => user.save()));
+      }
 
       res.send(project);
     } catch (err) {
@@ -115,33 +135,25 @@ module.exports = app => {
         startDate,
         notes,
         type,
-        ownerId: ownerId || req.user.id,
-        users
       }, { new: true });
 
       // remove all project people
       await ProjectUser.remove({ projectId: updatedProject._id })
 
-      // add new object people
-      const projectOwner = new ProjectUser({
-        userId: ownerId || req.user.id,
-        projectId: updatedProject._id,
-        roles: ['owner'],
-        formTypesMustSubmit: [],
-        formTypesMustReview: users.map(({ formTypeId }) => formTypeId),
-        datePutOnTheProject: startDate
-      });
-
       const projectUsers = users.reduce((prev, curr) => {
         let ind;
-        const alreadyExists = prev.find((e, i) => {
-          if (e.userId === curr.userId) ind = i;
-          return e.userId === curr.userId
-        });
-        if (alreadyExists) {
-          alreadyExists.formTypesMustSubmit = [ ...alreadyExists.formTypesMustSubmit, u.formTypeId];
-          prev[ind] = alreadyExists;
-          return prev;
+        let existingUser;
+        for (let u = 0; u < prev.length; u++) {
+          if (prev[u].userId.toString() === curr.userId) {
+            existingUser = prev[u];
+            ind = u;
+            break;
+          }
+        }
+        if (existingUser) {
+          existingUser.formTypesMustSubmit = [ ...existingUser.formTypesMustSubmit, curr.formTypeId];
+          const newArr = Object.assign([], prev, { ind: existingUser });
+          return newArr;
         } else {
           const us = new ProjectUser({
             userId: curr.userId,
@@ -153,9 +165,33 @@ module.exports = app => {
         }
       }, []);
 
-      const combinedUsers = [...projectUsers, projectOwner];
-
-      await Promise.all(combinedUsers.map(user => user.save()));
+      let indOwner;
+      let existingUserOwner;
+      const ownerUserId = ownerId || req.user.id;
+      for (let u = 0; u < projectUsers.length; u++) {
+        if (projectUsers[u].userId.toString() === ownerUserId) {
+          existingUserOwner = projectUsers[u];
+          indOwner = u;
+          break;
+        }
+      }
+      if (existingUserOwner) {
+        existingUserOwner.roles = [...existingUserOwner.roles, 'owner']
+        existingUserOwner.formTypesMustReview = users.map(({ formTypeId }) => formTypeId)
+        const newArr = Object.assign([], projectUsers, { indOwner: existingUserOwner });
+        await Promise.all(newArr.map(user => user.save()));
+      } else {
+        const projectOwner = new ProjectUser({
+          userId: ownerId || req.user.id,
+          projectId: newProject._id,
+          roles: ['owner'],
+          formTypesMustSubmit: [],
+          formTypesMustReview: users.map(({ formTypeId }) => formTypeId),
+          datePutOnTheProject: startDate
+        });
+        const combinedUsers = [...projectUsers, projectOwner];
+        await Promise.all(combinedUsers.map(user => user.save()));
+      }
 
       res.send(updatedProject);
     } catch (err) {

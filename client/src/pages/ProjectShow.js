@@ -50,6 +50,7 @@ class ProjectShow extends React.Component {
   };
 
   async componentDidMount() {
+    console.log('mount')
     await this.props.fetchUsers();
     await this.props.fetchAvailableForms();
     await this.props.fetchProjectDetails(this.props.match.params.id);
@@ -74,7 +75,7 @@ class ProjectShow extends React.Component {
         }, {});
         return { ...prev, ...newObjSubmit };
       }, {});
-      const owner = project.projectUsers.find(({ roles }) => roles[0] === 'owner');
+      const owner = project.projectUsers.find(({ roles }) => roles.includes('owner'));
       selectedForms.adminForm = { firstName: owner.userId.firstName, lastName: owner.userId.lastName, personId: owner.userId._id, title: 'Admin', _id: 'adminForm' };
       this.setState({ selectedForms });
     }
@@ -130,14 +131,16 @@ class ProjectShow extends React.Component {
 
   render() {
     const { classes, project, loading, user } = this.props;
+    console.log(this.props)
     if (loading) return <div className={classes.progressWrapper}>
       <CircularProgress size={50} />
     </div>;
     if (!project) return <div />;
+    if (!project.projectUsers) return <div />;
 
     let doNotRenderButton = false;
     let disabled = false;
-    const admin = project.projectUsers.find(({ roles }) => roles[0] === 'owner');
+    const admin = project.projectUsers.find(({ roles }) => roles.includes('owner'));
     if (admin) {
       if (admin.userId._id !== user._id) {
         doNotRenderButton = true;
@@ -174,7 +177,8 @@ const mapStateToProps = state => {
     project: state.projects.project,
     users: state.users.users,
     availableForms: state.forms.availableForms,
-    user: state.auth.user
+    user: state.auth.user,
+    loading: state.projects.loading
   };
 }
 

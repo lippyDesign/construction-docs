@@ -159,6 +159,7 @@ class ProjectNew extends React.Component {
       ownerId: this.state.selectedForms.adminForm ? this.state.selectedForms.adminForm.personId : null,
       users
     };
+    console.log(users)
     this.props.createNewProject(projectData, this.props.history);
   }
 

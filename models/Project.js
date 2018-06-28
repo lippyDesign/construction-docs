@@ -10,7 +10,5 @@ mongoose.model('Project', new Schema({
   createdAt: { type: Date, default: Date.now },
   startDate: { type: Date, required: true },
   notes: String,
-  type: { type: String, required: true },
-  // ownerId: { type: Schema.Types.ObjectId, ref: 'ProjectUser', required: true },
-  // users: [{ type: Schema.Types.ObjectId, ref: 'ProjectUser' }]
+  type: { type: String, required: true }
 }));
