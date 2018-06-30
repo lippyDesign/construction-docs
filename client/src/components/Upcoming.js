@@ -37,22 +37,28 @@ class Upcoming extends React.Component {
 
   renderUpcoming = () => {
     const { classes, upcomingForms, history } = this.props;
+    if (!upcomingForms.length) return <Paper className={classes.sectionPaper}>
+      <Typography variant="subheading" noWrap className={classes.sectionTitle}>
+        You are up to date on all of your forms
+      </Typography>
+    </Paper>
     return <Paper className={classes.sectionPaper}>
       <Typography variant="subheading" noWrap className={classes.sectionTitle}>
         Upcoming
       </Typography>
       <List>
-        {upcomingForms.map(form => <ListItem button key={`${form._id}-${form.projectId}`} onClick={() => history.push(`/forms/new/${form.projectId}/${form._id}`)}>
+        {upcomingForms.map(form => <ListItem button key={form._id} onClick={() => history.push(`/forms/new/${form.projectId._id}/${form.formTypeId._id}`)}>
           <Avatar>
             <SubjectIcon />
           </Avatar>
-          <ListItemText primary={form.title} secondary={`Due on 2018-06-25, ${form.projectTitle}`} />
+          <ListItemText primary={form.formTypeId.title} secondary={`Due on ${form.dueOn.substring(0, 10)}, ${form.projectId.title}`} />
         </ListItem>)}
       </List>
     </Paper>
   }
 
   render() {
+    console.log(this.props.upcomingForms)
     if (this.props.upcomingFormsLoading) return <div />;
     if (this.props.upcomingFormsError) return <div>
       <Typography variant="subheading" noWrap className={this.props.classes.sectionTitle}>

@@ -47,7 +47,12 @@ class Projects extends React.Component {
 
   render() {
     if (this.props.error) return <Typography variant="subheading">{this.props.error}</Typography>
-    if (!this.props.user || !this.props.userProjects.length) return <div />;
+    if (!this.props.user) return <div />;
+    if (!this.props.userProjects.length) return <Paper className={this.props.classes.sectionPaper}>
+      <Typography variant="subheading" noWrap className={this.props.classes.sectionTitle}>
+        You are not a part of any projects yet
+      </Typography>
+    </Paper>
     return <div className={this.props.classes.wrapper}>
       {this.renderProjects()}
     </div>;

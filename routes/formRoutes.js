@@ -91,21 +91,13 @@ module.exports = app => {
 
   /////// FORMS UPCOMING ///////
 
-  // GET all forms that user must submit soon
+  // GET all forms that user must submit soon and forms that are past due
   app.get('/api/upcoming/forms', requireLogin, async (req, res) => {
     try {
-      const projectUsers = await ProjectUser.find({ userId: req.user.id })
-        .populate('formTypesMustSubmit')
-        .populate('formTypesMustReview')
+      const upcomingForms = await Form.find({ shouldBeSubmittedBy: req.user.id, submittedBy: null })
+        .sort({ dueOn: -1 })
         .populate('projectId')
-
-      const upcomingForms = projectUsers.reduce((prev, curr) => {
-        const nextVal = [];
-        curr.formTypesMustSubmit.forEach(({ title, shortName, _id }) => {
-          nextVal.push({ title, shortName, _id, projectId: curr.projectId._id, projectTitle: curr.projectId.title });
-        })
-        return [...prev, ...nextVal]
-      }, []);
+        .populate('formTypeId');
 
       res.send(upcomingForms);
     } catch(e) {

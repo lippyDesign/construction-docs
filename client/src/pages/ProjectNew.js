@@ -159,7 +159,6 @@ class ProjectNew extends React.Component {
       ownerId: this.state.selectedForms.adminForm ? this.state.selectedForms.adminForm.personId : null,
       users
     };
-    console.log(users)
     this.props.createNewProject(projectData, this.props.history);
   }
 
@@ -179,7 +178,6 @@ class ProjectNew extends React.Component {
   }
 
   render() {
-    console.log(this.state.selectedForms)
     const { classes, projectLoading, error, availableForms, usersLoading } = this.props;
     if (error) return <Typography variant="subheading">{error}</Typography>
     if (projectLoading || usersLoading) return <div className={classes.progressWrapper}>

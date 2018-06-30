@@ -16,7 +16,7 @@ setInterval(async () => {
 
     // if due date is more than 24 hours ago and there is still no submission, send notifications
 
-    // insert today's new forms into the forms that users are responsible for
+    // insert today's new forms into the forms that users are responsible for (need to check if already submitted?)
   } catch (e) {
     console.log(e);
   }

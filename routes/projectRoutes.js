@@ -4,6 +4,7 @@ const cleanCache = require('../middlewares/cleanCache');
 
 const Project = mongoose.model('Project');
 const ProjectUser = mongoose.model('ProjectUser');
+const Form = mongoose.model('Form');
 
 module.exports = app => {
   // GET a project with a particular id
@@ -115,7 +116,27 @@ module.exports = app => {
         await Promise.all(combinedUsers.map(user => user.save()));
       }
 
-      res.send(project);
+      const now = Date.now()
+      const projectStartDate = + newProject.startDate
+
+      // if project starts today, need to create forms that are due
+      if (+now >= projectStartDate) {
+        const pUsers = await ProjectUser.find({ projectId: newProject._id });
+        const formsToSubmit = pUsers.reduce((prev, curr) => {
+          const fs = curr.formTypesMustSubmit.map(f => {
+            return new Form({
+              dueOn: new Date().toISOString(),
+              formTypeId: f,
+              projectId: newProject._id,
+              shouldBeSubmittedBy: curr.userId
+            });
+          });
+          return [...prev, ...fs]
+        }, []);
+        await Promise.all(formsToSubmit.map(f => f.save()));
+      }
+      
+      res.send(newProject);
     } catch (err) {
       console.log(err);
       res.status(400).send('Unable to create project');
