@@ -19,11 +19,13 @@ const styles = theme => ({
   sectionPaper: {
     padding: 20,
     minHeight: 480,
-    flex: 1
-  },
-  sectionPaperTwo: {
-    marginTop: 16,
-    padding: 20,
+    flex: 1,
+    ['@media (min-width:375px)']: { // eslint-disable-line no-useless-computed-key
+      height: 550
+    },
+    [theme.breakpoints.up('md')]: {
+      minHeight: 795
+    }
   },
   sectionTitle: {
     textAlign: 'center'
@@ -58,7 +60,6 @@ class Upcoming extends React.Component {
   }
 
   render() {
-    console.log(this.props.upcomingForms)
     if (this.props.upcomingFormsLoading) return <div />;
     if (this.props.upcomingFormsError) return <div>
       <Typography variant="subheading" noWrap className={this.props.classes.sectionTitle}>

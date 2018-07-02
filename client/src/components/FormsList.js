@@ -17,7 +17,10 @@ const styles = theme => ({
   sectionPaper: {
     padding: '20px 2px',
     minHeight: 480,
-    flex: 1
+    flex: 1,
+    ['@media (min-width:375px)']: { // eslint-disable-line no-useless-computed-key
+      minHeight: 650
+    },
   },
   sectionTitle: {
     textAlign: 'center'
@@ -38,7 +41,7 @@ class FormsList extends React.Component {
             <SubjectIcon />
           </Avatar>
           <ListItemText
-            primary={`${form.formTypeId.title} ${form.formTypeId.shortName ? `(form.formTypeId.shortName)` : ''}`}
+            primary={`${form.formTypeId.title} ${form.formTypeId.shortName ? `(${form.formTypeId.shortName})` : ''}`}
             secondary={`${form.submittedOn.substring(0, 10)}, ${form.projectId.title}`}
           />
         </ListItem>)}
@@ -47,7 +50,6 @@ class FormsList extends React.Component {
   }
 
   render() {
-    console.log(this.props.userForms)
     if (this.props.error) return <Typography variant="subheading">{this.props.error}</Typography>
     return <div className={this.props.classes.wrapper}>
       {this.renderForms()}

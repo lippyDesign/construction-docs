@@ -1,10 +1,14 @@
 const mongoose = require('mongoose');
+const moment = require('moment');
+
 const requireLogin = require('../middlewares/requireLogin');
 const cleanCache = require('../middlewares/cleanCache');
 
 const Project = mongoose.model('Project');
 const ProjectUser = mongoose.model('ProjectUser');
-const Form = mongoose.model('Form');
+// const Form = mongoose.model('Form');
+
+const { createFormThatWillBeDue } = require('../services/formsDue');
 
 module.exports = app => {
   // GET a project with a particular id
@@ -18,7 +22,6 @@ module.exports = app => {
       const accessValidated = projectUsers.some(pUser => pUser.userId.id === req.user.id);
       if (accessValidated) {
         const combined = { ...project.toObject(), projectUsers}
-        console.log(projectUsers)
         res.send(combined);
       } else {
         res.status(403).send({});
@@ -55,7 +58,7 @@ module.exports = app => {
       city,
       state,
       postalCode,
-      startDate,
+      startDate: moment(startDate).format(),
       notes,
       type
     });
@@ -122,18 +125,17 @@ module.exports = app => {
       // if project starts today, need to create forms that are due
       if (+now >= projectStartDate) {
         const pUsers = await ProjectUser.find({ projectId: newProject._id });
-        const formsToSubmit = pUsers.reduce((prev, curr) => {
+        await Promise.all(pUsers.reduce((prev, curr) => {
           const fs = curr.formTypesMustSubmit.map(f => {
-            return new Form({
-              dueOn: new Date().toISOString(),
+            return createFormThatWillBeDue({
+              dueOn: moment().format(),
               formTypeId: f,
               projectId: newProject._id,
               shouldBeSubmittedBy: curr.userId
-            });
+            })
           });
           return [...prev, ...fs]
-        }, []);
-        await Promise.all(formsToSubmit.map(f => f.save()));
+        }, []));
       }
       
       res.send(newProject);

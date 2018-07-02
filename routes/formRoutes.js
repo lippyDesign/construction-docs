@@ -45,7 +45,8 @@ module.exports = app => {
       notes,
       imageUrls,
       projectId,
-      submittedBy: req.user.id
+      submittedBy: req.user.id,
+      submittedOn: Date.now()
     });
     try {
       await form.save();

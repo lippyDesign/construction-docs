@@ -50,6 +50,9 @@ const styles = theme => ({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
+    ['@media (min-width:375px)']: { // eslint-disable-line no-useless-computed-key
+      minHeight: 650
+    },
     [theme.breakpoints.up('md')]: {
       height: 900
     }
@@ -267,7 +270,7 @@ class FormNew extends React.Component {
 
   render() {
     const { classes, availableForms, selectedForm, submitting, projectsLoading, userProjects } = this.props;
-    if (!availableForms || !selectedForm || projectsLoading) return <div />;
+    if (!availableForms || !selectedForm || projectsLoading) return <div className={classes.progressWrapper} />;
     if (!userProjects.length) return <div className={classes.progressWrapper}>
       <Typography variant="subheading" noWrap>You are not a part of any projects. You must be part of a project to be able to submit a form</Typography>
     </div>;

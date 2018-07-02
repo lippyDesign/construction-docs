@@ -36,6 +36,14 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'center',
     paddingBottom: 8
+  },
+  sectionPaper: {
+    padding: 20,
+    minHeight: 480,
+    flex: 1,
+    [theme.breakpoints.up('md')]: {
+      minHeight: 900
+    }
   }
 });
 
@@ -111,7 +119,9 @@ class ProjectsOverview extends React.Component {
   ///////// RENDER ///////////////
 
   render() {
-    if (!sidebarOptions || !this.state.selectedSidebarOption || this.props.loading) return <div />;
+    if (!sidebarOptions || !this.state.selectedSidebarOption || this.props.loading) {
+      return <div className={this.props.classes.sectionPaper} />
+    }
     return <Drawer
       drawerMainTitle={this.getDrawerTitle()}
       drawerMainContent={this.getDrawerMainContent()}

@@ -66,7 +66,12 @@ const styles = theme => ({
   bar: { color: '#9F9F9F'},
   checked: { color: '#9F9F9F' },
   sectionPaper: {
-    padding: 20
+    padding: 20,
+    minHeight: 480,
+    flex: 1,
+    [theme.breakpoints.up('md')]: {
+      minHeight: 900
+    }
   },
   sectionTitle: {
     textAlign: 'center'
@@ -244,7 +249,9 @@ class FormsOverview extends React.Component {
     // const { classes } = this.props;
     // const { formsSidebarItems, selectedForms } = this.props;
     // if (!formsSidebarItems || !selectedForms) return <div />;
-    if (!this.props.userForms) return <div/>;
+    if (!this.props.userForms) {
+      return <div className={this.props.classes.sectionPaper} />
+    }
     return <Drawer
       // drawerMainTitle={selectedForms}
       drawerMainTitle="My Forms"

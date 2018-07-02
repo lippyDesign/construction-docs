@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
@@ -12,18 +13,28 @@ import ProjectPeople from '../components/ProjectPeople';
 const styles = theme => ({
   sectionPaper: {
     margin: '16px 8px',
-    padding: '8px 8px 100px 8px',
+    padding: '30px 8px 100px 8px',
     display: 'flex',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    minHeight: 480,
+    [theme.breakpoints.up('md')]: {
+      minHeight: 900
+    }
   },
   formWrapper: {
-    maxWidth: 700
+    maxWidth: 900
   },
   progressWrapper: {
     height: 480,
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    ['@media (min-width:375px)']: { // eslint-disable-line no-useless-computed-key
+      height: 640
+    },
+    [theme.breakpoints.up('md')]: {
+      minHeight: 900
+    }
   }
 });
 
@@ -50,7 +61,6 @@ class ProjectShow extends React.Component {
   };
 
   async componentDidMount() {
-    console.log('mount')
     await this.props.fetchUsers();
     await this.props.fetchAvailableForms();
     await this.props.fetchProjectDetails(this.props.match.params.id);
@@ -61,7 +71,7 @@ class ProjectShow extends React.Component {
     if (prevProps.project !== project && project) {
       updateFormInitialValues({
         'Project Title': project.title,
-        'Project Start Date': project.startDate.substring(0, 10),
+        'Project Start Date': moment(project.startDate).format('YYYY-MM-DD'),
         'Project Address': project.address,
         'Project City': project.city,
         'Project State': project.state,
@@ -131,12 +141,11 @@ class ProjectShow extends React.Component {
 
   render() {
     const { classes, project, loading, user } = this.props;
-    console.log(this.props)
     if (loading) return <div className={classes.progressWrapper}>
       <CircularProgress size={50} />
     </div>;
-    if (!project) return <div />;
-    if (!project.projectUsers) return <div />;
+    if (!project) return <div className={classes.progressWrapper} />;
+    if (!project.projectUsers) return <div className={classes.progressWrapper} />;
 
     let doNotRenderButton = false;
     let disabled = false;

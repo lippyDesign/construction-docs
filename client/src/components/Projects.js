@@ -15,9 +15,15 @@ const styles = theme => ({
     display: 'flex'
   },
   sectionPaper: {
-    padding: '20px 2px',
+    padding: 20,
     minHeight: 480,
-    flex: 1
+    flex: 1,
+    ['@media (min-width:375px)']: { // eslint-disable-line no-useless-computed-key
+      minHeight: 550
+    },
+    [theme.breakpoints.up('md')]: {
+      minHeight: 795
+    }
   },
   sectionTitle: {
     textAlign: 'center'
@@ -47,7 +53,7 @@ class Projects extends React.Component {
 
   render() {
     if (this.props.error) return <Typography variant="subheading">{this.props.error}</Typography>
-    if (!this.props.user) return <div />;
+    if (!this.props.user) return <Paper className={this.props.classes.sectionPaper} />
     if (!this.props.userProjects.length) return <Paper className={this.props.classes.sectionPaper}>
       <Typography variant="subheading" noWrap className={this.props.classes.sectionTitle}>
         You are not a part of any projects yet

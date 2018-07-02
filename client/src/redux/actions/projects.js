@@ -37,10 +37,8 @@ export const FETCH_PROJECT_DETAILS_SUCCESS = 'fetch_project_success';
 export const FETCH_PROJECT_DETAILS_ERROR = 'fetch_project_error';
 export const fetchProjectDetails = projectId => async dispatch => {
   dispatch({ type: FETCH_PROJECT_DETAILS_START });
-  console.log('fetching')
   try {
     const { data } = await axios.get(`/api/projects/${projectId}`);
-    console.log(data)
     dispatch({ type: FETCH_PROJECT_DETAILS_SUCCESS, payload: data });
   } catch (e) {
     console.log(e);

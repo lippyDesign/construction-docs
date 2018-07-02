@@ -23,7 +23,13 @@ const styles = theme => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    ['@media (min-width:375px)']: { // eslint-disable-line no-useless-computed-key
+      minHeight: 550
+    },
+    [theme.breakpoints.up('md')]: {
+      minHeight: 795
+    }
   },
   formWrapper: {
     maxWidth: 700,
@@ -45,6 +51,9 @@ const styles = theme => ({
   },
   gry: {
     color: 'gray'
+  },
+  imagesWrapper: {
+    maxWidth: 700
   }
 });
 
@@ -70,7 +79,7 @@ class FormShow extends React.Component {
         'Number of workers': userForm.numberOfWorkers,
         'Number of units of equipment': userForm.numberOfUnitsOfEquipment,
         'Notes': userForm.notes,
-        'Date on the form': userForm.formDate.substring(0, 10)
+        'Date on the form': moment(userForm.formDate).format('YYYY-MM-DD')
       });
     }
   }
@@ -112,20 +121,19 @@ class FormShow extends React.Component {
   }
 
   render() {
-    console.log(this.props)
     const { classes, userForm, loading, selectedForm, error, userProjects } = this.props;
     if (loading) return <div className={classes.progressWrapper}>
       <CircularProgress size={50} />
     </div>;
-    if (!userForm || !selectedForm || !userProjects) return <div />;
+    if (!userForm || !selectedForm || !userProjects) return <div className={classes.progressWrapper} />;
     return <Paper className={classes.sectionPaper}>
-      <div>
+      <div className={classes.imagesWrapper}>
         <FormImages imageUrls={userForm.imageUrls} />
       </div>
       <div className={classes.formWrapper}>
         <Typography variant="title">{`${selectedForm.title} ${selectedForm.shortName ? `(${selectedForm.shortName})` : ''}`}</Typography>
-        <Typography className={classes.gry} variant="body1">Due on {userForm.dueOn.substring(0, 10)}</Typography>
-        <Typography className={classes.gry} variant="body1">Submitted on {userForm.submittedOn.substring(0, 10)}</Typography>
+        <Typography className={classes.gry} variant="body1">Due on {moment(userForm.dueOn).format('MMM Do, YYYY')}</Typography>
+        <Typography className={classes.gry} variant="body1">Submitted on {moment(userForm.submittedOn).format('MMM Do, YYYY')}</Typography>
         {this.renderProjectSelect()}
         <GenericForm
           form={userForm._id}

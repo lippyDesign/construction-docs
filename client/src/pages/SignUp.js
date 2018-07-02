@@ -96,6 +96,9 @@ const styles = theme => ({
     justifyContent: 'center',
     alignItems: 'center',
     height: 560,
+    ['@media (min-width:375px)']: { // eslint-disable-line no-useless-computed-key
+      height: 630
+    },
     [theme.breakpoints.up('md')]: {
       height: 820
     }

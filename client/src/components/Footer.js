@@ -23,8 +23,8 @@ const styles = theme => ({
 });
 
 const Footer = ({ classes }) => <Paper className={classes.container}>
-  <Typography className={classes.text} type="body1">© {new Date().getFullYear()} EZ Submittals</Typography>
-  <Typography className={classes.text} type="body1">The safety forms manager you need</Typography>
+  <Typography className={classes.text} type="body1">© {new Date().getFullYear()} EZ Dailies</Typography>
+  <Typography className={classes.text} type="body1">Take your form management to the next level</Typography>
 </Paper>
 
 export default withStyles(styles)(Footer);
