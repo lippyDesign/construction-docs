@@ -114,8 +114,8 @@ class FormNew extends React.Component {
     await this.props.fetchProjects();
     await this.props.fetchAvailableForms();
     this.props.updateFormInitialValues({ 'Date on the form': moment().format("YYYY-MM-DD") });
-    if (this.props.match.params.formId) {
-      this.handleFormSelect(this.props.match.params.formId);
+    if (this.props.match.params.formTypeId) {
+      this.handleFormSelect(this.props.match.params.formTypeId);
     }
     if (this.props.match.params.projectId) {
       this.setState({ project: this.props.match.params.projectId });
@@ -125,18 +125,23 @@ class FormNew extends React.Component {
   ///////// SIDEBAR ///////////////
 
   handleFormSelect = id => {
-    this.props.handleFormSelect(id);
+    const { formId } = this.props.match.params;
+    if (formId) {
+      this.props.handleFormSelect(id);
+    }
     this.setState({ mobileOpen: false });
   }
 
   renderListOfForms = () => {
-    const { classes, selectedForm } = this.props;
+    const { classes, selectedForm, availableForms } = this.props;
+    const { formId } = this.props.match.params;
+    const forms = formId ? availableForms.filter(({ _id }) => _id === selectedForm._id) : availableForms;
     return <List>
-      {this.props.availableForms.map(({ title, _id }) => <ListItem 
-      className={classes.menuListItem} 
-      key={_id}
-      button
-      onClick={() => this.handleFormSelect(_id)}
+      {forms.map(({ title, _id }) => <ListItem 
+        className={classes.menuListItem} 
+        key={_id}
+        button
+        onClick={() => this.handleFormSelect(_id)}
       >
         <ListItemText primary={title} classes={{ primary: _id === selectedForm._id ? classes.selectedFormSidebarText : '' }}  />
       </ListItem>)}
@@ -173,6 +178,8 @@ class FormNew extends React.Component {
 
   renderProjectSelect = () => {
     const { classes, userProjects } = this.props;
+    const { formId, projectId } = this.props.match.params;
+    const projects = formId ? userProjects.filter(({ _id}) => _id === projectId) : userProjects;
     return <div>
       <FormControl className={classes.formControl}>
         <InputLabel htmlFor="project-simple">Project that this form is for *</InputLabel>
@@ -184,7 +191,7 @@ class FormNew extends React.Component {
             id: 'project-simple',
           }}
         >
-          {userProjects.map(({ _id, title }) => <MenuItem key={_id} value={_id}>{title}</MenuItem>)}
+          {projects.map(({ _id, title }) => <MenuItem key={_id} value={_id}>{title}</MenuItem>)}
         </Select>
       </FormControl>
     </div>;
@@ -248,8 +255,10 @@ class FormNew extends React.Component {
       numberOfUnitsOfEquipment: formValues['Number of units of equipment'],
       notes: formValues['Notes'],
       formTypeId: selectedForm._id,
-      projectId: this.state.project
+      projectId: this.state.project,
+      formId: this.props.match.params.formId
     }
+    // this.props.submitForm(this.state.images, formData, this.props.history);
     this.props.submitForm(this.state.images, formData, this.props.history);
   }
 

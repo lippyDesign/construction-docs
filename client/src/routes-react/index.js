@@ -23,7 +23,7 @@ const Routes = () => <div className='appContent'>
     <PrivateOnlyRoute exact path='/projects/:id' component={ProjectShow} />
     <PrivateOnlyRoute exact path='/projects' component={ProjectsOverview} />
     <PrivateOnlyRoute exact path='/forms/new' component={FormNew} />
-    <PrivateOnlyRoute exact path='/forms/new/:projectId/:formId' component={FormNew} />
+    <PrivateOnlyRoute exact path='/forms/new/:projectId/:formTypeId/:formId' component={FormNew} />
     <PrivateOnlyRoute exact path="/forms" component={FormsOverview} />
     <PrivateOnlyRoute exact path="/forms/:id" component={FormShow} />
     <PrivateOnlyRoute exact path="/dashboard" component={Dashboard} />

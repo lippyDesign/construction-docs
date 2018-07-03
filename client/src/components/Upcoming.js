@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -49,11 +50,11 @@ class Upcoming extends React.Component {
         Upcoming
       </Typography>
       <List>
-        {upcomingForms.map(form => <ListItem button key={form._id} onClick={() => history.push(`/forms/new/${form.projectId._id}/${form.formTypeId._id}`)}>
+        {upcomingForms.map(form => <ListItem button key={form._id} onClick={() => history.push(`/forms/new/${form.projectId._id}/${form.formTypeId._id}/${form._id}`)}>
           <Avatar>
             <SubjectIcon />
           </Avatar>
-          <ListItemText primary={form.formTypeId.title} secondary={`Due on ${form.dueOn.substring(0, 10)}, ${form.projectId.title}`} />
+          <ListItemText primary={form.formTypeId.title} secondary={`Due on ${moment(form.dueOn).format('MMM Do, YYYY')} - ${form.projectId.title}`} />
         </ListItem>)}
       </List>
     </Paper>

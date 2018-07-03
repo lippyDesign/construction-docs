@@ -35,25 +35,44 @@ module.exports = app => {
 
   // POST submit a new form
   app.post('/api/forms', requireLogin, cleanCache, async (req, res) => {
-    const { formDate, numberOfWorkers, numberOfUnitsOfEquipment, notes, imageUrls, projectId, formTypeId } = req.body;
-    const form = new Form({
-      dueOn: formDate,
-      formTypeId,
-      formDate,
-      numberOfWorkers,
-      numberOfUnitsOfEquipment,
-      notes,
-      imageUrls,
-      projectId,
-      submittedBy: req.user.id,
-      submittedOn: Date.now()
-    });
-    try {
-      await form.save();
-      res.send(form);
-    } catch (err) {
-      console.log(err);
-      res.status(400).send('unable to create form');
+    const { formDate, numberOfWorkers, numberOfUnitsOfEquipment, notes, imageUrls, projectId, formTypeId, formId } = req.body;
+    if (formId) {
+      try {
+        const updatedForm = await Form.findByIdAndUpdate(formId, {
+          numberOfWorkers,
+          numberOfUnitsOfEquipment,
+          notes,
+          formDate,
+          projectId,
+          imageUrls,
+          submittedOn: Date.now(),
+          submittedBy: req.user.id
+        });
+        res.send(updatedForm);
+      } catch (err) {
+        console.log(err);
+        res.status(400).send('Unable to update form');
+      }
+    } else {
+      const form = new Form({
+        dueOn: formDate,
+        formTypeId,
+        formDate,
+        numberOfWorkers,
+        numberOfUnitsOfEquipment,
+        notes,
+        imageUrls,
+        projectId,
+        submittedBy: req.user.id,
+        submittedOn: Date.now()
+      });
+      try {
+        await form.save();
+        res.send(form);
+      } catch (err) {
+        console.log(err);
+        res.status(400).send('unable to create form');
+      }
     }
   });
 
@@ -67,6 +86,8 @@ module.exports = app => {
         notes,
         formDate,
         projectId,
+        // submittedOn: Date.now(),
+        // submittedBy: req.user.id
       });
       res.send(updatedForm);
     } catch (err) {

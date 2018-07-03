@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -33,7 +34,7 @@ class FormsList extends React.Component {
     const { classes, userForms, history } = this.props;
     return <Paper  className={classes.sectionPaper}>
       <Typography variant="subheading" noWrap className={classes.sectionTitle}>
-        My Forms
+        Submitted Forms
       </Typography>
       <List>
         {userForms.map(form => <ListItem button key={form._id} onClick={() => history.push(`/forms/${form._id}`)}>
@@ -42,7 +43,7 @@ class FormsList extends React.Component {
           </Avatar>
           <ListItemText
             primary={`${form.formTypeId.title} ${form.formTypeId.shortName ? `(${form.formTypeId.shortName})` : ''}`}
-            secondary={`${form.submittedOn.substring(0, 10)}, ${form.projectId.title}`}
+            secondary={`Submitted on ${moment(form.submittedOn).format('MMM Do, YYYY')} - ${form.projectId.title}`}
           />
         </ListItem>)}
       </List>
