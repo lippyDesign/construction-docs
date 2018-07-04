@@ -1,14 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom'
+// import { Link } from 'react-router-dom'
 import { withStyles } from '@material-ui/core/styles';
 import Toolbar from '@material-ui/core/Toolbar';
 import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
-import Button from '@material-ui/core/Button';
-// import ListItem from '@material-ui/core/ListItem';
-// import ListItemText from '@material-ui/core/ListItemText';
+// import Button from '@material-ui/core/Button';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
 // import Avatar from '@material-ui/core/Avatar';
 // import Paper from '@material-ui/core/Paper';
 // import FolderIcon from '@material-ui/icons/Folder';
@@ -18,10 +18,16 @@ import Button from '@material-ui/core/Button';
 // import Switch from '@material-ui/core/Switch';
 
 import FormsList from '../components/FormsList';
+import Upcoming from '../components/Upcoming';
 
 import { /*getFormsSidebarItems, selectFormsInSidebar,*/ fetchUserForms } from '../redux/actions';
 
 import Drawer from '../components/drawer/Drawer';
+
+const sidebarOptions = [
+  { name: 'Upcoming' },
+  { name: 'Submitted' }
+];
 
 const styles = theme => ({
   mainToolbarTwo: {
@@ -86,7 +92,9 @@ const styles = theme => ({
 
 class FormsOverview extends React.Component {
 
-  state = { checkedByProject: true }
+  // state = { checkedByProject: true }
+
+  state = { selectedSidebarOption: 'Upcoming' };
 
   componentDidMount() {
     this.props.fetchUserForms();
@@ -135,26 +143,47 @@ class FormsOverview extends React.Component {
   //   // return this.renerForms();
   // }
 
+  // renderListOfSidebarOptions = () => {
+  //   const { classes /*, formsSidebarItems, selectedForms*/ } = this.props;
+  //   return <List>
+  //     {/* <div className={classes.newFormButtonWrapper}>
+  //       <Button variant="raised" color="secondary" component={Link} to="/forms/new">
+  //         submit new form
+  //       </Button>
+  //     </div> */}
+  //     <Divider />
+  //     {/* {this.renderSwitch()}
+  //     <Divider /> */}
+  //     {/* {formsSidebarItems.map(({ name }) => <ListItem 
+  //     className={classes.menuListItem} 
+  //     key={name}
+  //     button
+  //     onClick={() => this.handleOptionSelect(name)}
+  //     >
+  //       <ListItemText primary={name} classes={{ primary: name === selectedForms ? classes.selectedFormSidebarText : '' }}  />
+  //     </ListItem>)} */}
+  //   </List>
+  // }
+
   renderListOfSidebarOptions = () => {
-    const { classes /*, formsSidebarItems, selectedForms*/ } = this.props;
+    const { classes } = this.props;
     return <List>
-      <div className={classes.newFormButtonWrapper}>
-        <Button variant="raised" color="secondary" component={Link} to="/forms/new">
-          submit new form
-        </Button>
-      </div>
-      <Divider />
-      {/* {this.renderSwitch()}
-      <Divider /> */}
-      {/* {formsSidebarItems.map(({ name }) => <ListItem 
-      className={classes.menuListItem} 
-      key={name}
-      button
-      onClick={() => this.handleOptionSelect(name)}
+      {sidebarOptions.map(({ name }) => <ListItem 
+        className={classes.menuListItem} 
+        key={name}
+        button
+        onClick={() => this.handleOptionSelect(name)}
       >
-        <ListItemText primary={name} classes={{ primary: name === selectedForms ? classes.selectedFormSidebarText : '' }}  />
-      </ListItem>)} */}
+        <ListItemText
+          primary={name}
+          classes={{ primary: name === this.state.selectedSidebarOption ? classes.selectedFormSidebarText : '' }}
+        />
+      </ListItem>)}
     </List>
+  }
+
+  handleOptionSelect = name => {
+    this.setState({ selectedSidebarOption: name });
   }
 
   getDrawerSidebarContent = () => {
@@ -173,13 +202,12 @@ class FormsOverview extends React.Component {
   ///////// DRAWER MAIN ///////////////
 
   getDrawerMainContent = () => {
-    // if (this.props.date) return this.renderForms();
-    // if (this.state.checkedByProject) {
-    //   return this.renderProjects();
-    // } else {
-    //   return this.renderDates();
-    // }
-    return this.renderForms();
+    switch (this.state.selectedSidebarOption) {
+      case 'Submitted':
+        return this.renderForms();
+      default:
+        return <Upcoming history={this.props.history} />;
+    }
   }
 
   // renderDates = () => {
